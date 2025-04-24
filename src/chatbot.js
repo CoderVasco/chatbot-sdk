@@ -1,12 +1,51 @@
+// chatbot.js (versão completa e atualizada para embutir via import único)
+
+// Aguarda o carregamento do DOM
 document.addEventListener('DOMContentLoaded', () => {
-    // Create chatbot container
     const container = document.getElementById('chatbot-container');
     if (!container) {
         console.error('Chatbot container not found. Please add <div id="chatbot-container"></div> to your HTML.');
         return;
     }
 
-    // Inject HTML
+    // Google Fonts
+    const fontLink = document.createElement('link');
+    fontLink.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Orbitron:wght@700&display=swap';
+    fontLink.rel = 'stylesheet';
+    document.head.appendChild(fontLink);
+
+    // Estilos
+    const style = document.createElement('style');
+    style.textContent = `
+        .glassmorphism { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .neon-glow { box-shadow: 0 0 10px rgba(219, 39, 119, 0.8), 0 0 20px rgba(219, 39, 119, 0.4); }
+        .hover-scale { transition: transform 0.3s ease; }
+        .hover-scale:hover { transform: scale(1.05); }
+        .chatbot-message { max-width: 80%; word-break: break-word; }
+        .chatbot-message.bot { background: #4b5563; }
+        .chatbot-message.user { background: #db2777; margin-left: auto; }
+        #chatbot-messages::-webkit-scrollbar { width: 6px; }
+        #chatbot-messages::-webkit-scrollbar-track { background: #1f2937; }
+        #chatbot-messages::-webkit-scrollbar-thumb { background: #db2777; border-radius: 3px; }
+        body { font-family: 'Poppins', sans-serif; }
+        h3 { font-family: 'Orbitron', sans-serif; }
+        @media (max-width: 320px) {
+            #chatbot { bottom: 2rem; right: 2rem; }
+            #chatbot-toggle { padding: 0.75rem; }
+            #chatbot-window { height: 350px; }
+            #chatbot-messages { padding: 0.5rem; }
+            .chatbot-message { padding: 0.5rem; font-size: 0.75rem; }
+            #chatbot-form input, #chatbot-form button { padding: 0.5rem; }
+            #chatbot-form svg { width: 0.875rem; height: 0.875rem; }
+        }
+        @keyframes ripple {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // HTML do chatbot
     container.innerHTML = `
         <div id="chatbot" class="fixed bottom-4 right-4 z-50">
             <button id="chatbot-toggle" class="bg-pink-500 text-white p-3 rounded-full neon-glow hover-scale" aria-label="Abrir chat">
@@ -49,50 +88,20 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
-    // Inject styles
-    const style = document.createElement('style');
-    style.textContent = `
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Orbitron:wght@700&display=swap');
-        .glassmorphism { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
-        .neon-glow { box-shadow: 0 0 10px rgba(219, 39, 119, 0.8), 0 0 20px rgba(219, 39, 119, 0.4); }
-        .hover-scale { transition: transform 0.3s ease; }
-        .hover-scale:hover { transform: scale(1.05); }
-        .chatbot-message { max-width: 80%; word-break: break-word; }
-        .chatbot-message.bot { background: #4b5563; }
-        .chatbot-message.user { background: #db2777; margin-left: auto; }
-        #chatbot-messages::-webkit-scrollbar { width: 6px; }
-        #chatbot-messages::-webkit-scrollbar-track { background: #1f2937; }
-        #chatbot-messages::-webkit-scrollbar-thumb { background: #db2777; border-radius: 3px; }
-        body { font-family: 'Poppins', sans-serif; }
-        h3 { font-family: 'Orbitron', sans-serif; }
-        @media (max-width: 320px) {
-            #chatbot { bottom: 2rem; right: 2rem; }
-            #chatbot-toggle { padding: 0.75rem; }
-            #chatbot-window { height: 350px; }
-            #chatbot-messages { padding: 0.5rem; }
-            .chatbot-message { padding: 0.5rem; font-size: 0.75rem; }
-            #chatbot-form input, #chatbot-form button { padding: 0.5rem; }
-            #chatbot-form svg { width: 0.875rem; height: 0.875rem; }
-        }
-    `;
-    document.head.appendChild(style);
-
-    // Toggle chat window
+    // Botões toggle e close
     const toggleBtn = document.getElementById('chatbot-toggle');
     const closeBtn = document.getElementById('chatbot-close');
     const chatWindow = document.getElementById('chatbot-window');
-
     toggleBtn.addEventListener('click', () => {
         chatWindow.classList.toggle('hidden');
         chatWindow.classList.toggle('translate-x-full');
     });
-
     closeBtn.addEventListener('click', () => {
         chatWindow.classList.add('hidden');
         chatWindow.classList.add('translate-x-full');
     });
 
-    // Handle form submission
+    // Mensagens
     const form = document.getElementById('chatbot-form');
     const input = document.getElementById('chatbot-input');
     const fileInput = document.getElementById('chatbot-file');
@@ -102,14 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         if (!input.value.trim()) return;
-
-        // Add user message
         const userMessage = document.createElement('div');
         userMessage.className = 'chatbot-message user mb-2 p-2 sm:p-3 rounded-lg text-white text-sm sm:text-base';
         userMessage.textContent = input.value;
         messages.appendChild(userMessage);
 
-        // Mock bot response
         setTimeout(() => {
             const botMessage = document.createElement('div');
             botMessage.className = 'chatbot-message bot mb-2 p-2 sm:p-3 rounded-lg text-white text-sm sm:text-base';
@@ -122,14 +128,12 @@ document.addEventListener('DOMContentLoaded', () => {
         messages.scrollTop = messages.scrollHeight;
     });
 
-    // Handle file upload
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
-        // File validation
         const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg'];
-        const maxSize = 5 * 1024 * 1024; // 5MB
+        const maxSize = 5 * 1024 * 1024;
+
         if (!allowedTypes.includes(file.type)) {
             fileError.textContent = 'Apenas PDF, PNG ou JPG são permitidos.';
             fileError.classList.remove('hidden');
@@ -140,10 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
             fileError.classList.remove('hidden');
             return;
         }
-
         fileError.classList.add('hidden');
 
-        // Mock file upload
         const fileMessage = document.createElement('div');
         fileMessage.className = 'chatbot-message user mb-2 p-2 sm:p-3 rounded-lg text-white text-sm sm:text-base';
         fileMessage.innerHTML = `
@@ -152,7 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         messages.appendChild(fileMessage);
 
-        // Mock bot response for file
         setTimeout(() => {
             const botMessage = document.createElement('div');
             botMessage.className = 'chatbot-message bot mb-2 p-2 sm:p-3 rounded-lg text-white text-sm sm:text-base';
@@ -165,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messages.scrollTop = messages.scrollHeight;
     });
 
-    // Button ripple effect
+    // Efeito ripple
     document.querySelectorAll('button').forEach((el) => {
         el.addEventListener('click', (e) => {
             const ripple = document.createElement('span');
@@ -183,13 +184,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-
-// Ripple animation
-const rippleStyle = document.createElement('style');
-rippleStyle.textContent = `
-    @keyframes ripple {
-        0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-        100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
-    }
-`;
-document.head.appendChild(rippleStyle);

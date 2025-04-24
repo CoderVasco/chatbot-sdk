@@ -1,6 +1,3 @@
-// chatbot.js (versão completa e atualizada para embutir via import único)
-
-// Aguarda o carregamento do DOM
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('chatbot-container');
     if (!container) {
@@ -8,13 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Google Fonts
+    // Inject Google Fonts
     const fontLink = document.createElement('link');
     fontLink.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Orbitron:wght@700&display=swap';
     fontLink.rel = 'stylesheet';
     document.head.appendChild(fontLink);
 
-    // Estilos
+    // Inject Styles
     const style = document.createElement('style');
     style.textContent = `
         .glassmorphism { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); }
@@ -24,19 +21,30 @@ document.addEventListener('DOMContentLoaded', () => {
         .chatbot-message { max-width: 80%; word-break: break-word; }
         .chatbot-message.bot { background: #4b5563; }
         .chatbot-message.user { background: #db2777; margin-left: auto; }
+        .chatbot-typing { max-width: 80%; background: #4b5563; color: #ffffff; padding: 8px 12px; border-radius: 12px; font-size: 0.875rem; display: flex; align-items: center; }
+        .chatbot-typing::before { content: ''; display: inline-block; width: 6px; height: 6px; background: #ffffff; border-radius: 50%; margin-right: 4px; animation: typing-dot 1.5s infinite; }
+        .chatbot-typing::after { content: ''; display: inline-block; width: 6px; height: 6px; background: #ffffff; border-radius: 50%; margin-left: 4px; animation: typing-dot 1.5s infinite 0.3s; }
         #chatbot-messages::-webkit-scrollbar { width: 6px; }
         #chatbot-messages::-webkit-scrollbar-track { background: #1f2937; }
         #chatbot-messages::-webkit-scrollbar-thumb { background: #db2777; border-radius: 3px; }
         body { font-family: 'Poppins', sans-serif; }
         h3 { font-family: 'Orbitron', sans-serif; }
+        .powered-by { font-size: 0.75rem; color: #d1d5db; }
+        .powered-by a { color: #db2777; text-decoration: underline; }
+        .powered-by a:hover { color: #f472b6; }
         @media (max-width: 320px) {
-            #chatbot { bottom: 2rem; right: 2rem; }
+            #chatbot { bottom: 1rem; right: 1rem; }
             #chatbot-toggle { padding: 0.75rem; }
-            #chatbot-window { height: 350px; }
+            #chatbot-window { width: 80vw; height: 350px; }
             #chatbot-messages { padding: 0.5rem; }
-            .chatbot-message { padding: 0.5rem; font-size: 0.75rem; }
+            .chatbot-message, .chatbot-typing { padding: 0.5rem; font-size: 0.75rem; }
             #chatbot-form input, #chatbot-form button { padding: 0.5rem; }
             #chatbot-form svg { width: 0.875rem; height: 0.875rem; }
+            .powered-by { font-size: 0.625rem; }
+        }
+        @keyframes typing-dot {
+            0%, 20% { opacity: 1; }
+            40%, 100% { opacity: 0.3; }
         }
         @keyframes ripple {
             0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
@@ -45,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     document.head.appendChild(style);
 
-    // HTML do chatbot
+    // Inject HTML
     container.innerHTML = `
         <div id="chatbot" class="fixed bottom-4 right-4 z-50">
             <button id="chatbot-toggle" class="bg-pink-500 text-white p-3 rounded-full neon-glow hover-scale" aria-label="Abrir chat">
@@ -54,19 +62,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 </svg>
             </button>
             <div id="chatbot-window" class="hidden glassmorphism w-[90vw] max-w-[360px] h-[400px] sm:h-[500px] rounded-3xl shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300">
-                <div class="bg-gray-900 p-3 sm:p-4 rounded-t-3xl flex justify-between items-center">
-                    <h3 class="text-base sm:text-lg font-bold text-white">ChatBot AI</h3>
-                    <button id="chatbot-close" class="text-gray-300 hover:text-pink-500" aria-label="Fechar chat">
-                        <svg class="w-5 h-5 sm:w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <div id="chatbot-messages" class="flex-1 p-3 sm:p-4 overflow-y-auto bg-gray-800/50">
-                    <div class="chatbot-message bot mb-2 p-2 sm:p-3 bg-gray-700 rounded-lg text-white text-sm sm:text-base">
-                        Olá! Como posso ajudar você hoje?
+                <div class="bg-gray-900 p-3 sm:p-4 rounded-t-3xl flex flex-col">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-base sm:text-lg font-bold text-white">ChatBot AI</h3>
+                        <button id="chatbot-close" class="text-gray-300 hover:text-pink-500" aria-label="Fechar chat">
+                            <svg class="w-5 h-5 sm:w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
+                    <p class="powered-by mt-1">Powered by: <a href="https://tecnideia.ao" target="_blank">Tecnideia</a></p>
                 </div>
+                <div id="chatbot-messages" class="flex-1 p-3 sm:p-4 overflow-y-auto bg-gray-800/50"></div>
                 <div class="p-3 sm:p-4 border-t border-gray-700">
                     <form id="chatbot-form" class="flex items-center space-x-2">
                         <label for="chatbot-file" class="cursor-pointer">
@@ -88,46 +95,72 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
-    // Botões toggle e close
+    // Initialize elements
     const toggleBtn = document.getElementById('chatbot-toggle');
     const closeBtn = document.getElementById('chatbot-close');
     const chatWindow = document.getElementById('chatbot-window');
-    toggleBtn.addEventListener('click', () => {
-        chatWindow.classList.toggle('hidden');
-        chatWindow.classList.toggle('translate-x-full');
-    });
-    closeBtn.addEventListener('click', () => {
-        chatWindow.classList.add('hidden');
-        chatWindow.classList.add('translate-x-full');
-    });
-
-    // Mensagens
     const form = document.getElementById('chatbot-form');
     const input = document.getElementById('chatbot-input');
     const fileInput = document.getElementById('chatbot-file');
     const messages = document.getElementById('chatbot-messages');
     const fileError = document.getElementById('file-error');
 
+    // Welcome message logic
+    let hasWelcomed = sessionStorage.getItem('chatbotWelcomed');
+    toggleBtn.addEventListener('click', () => {
+        chatWindow.classList.toggle('hidden');
+        chatWindow.classList.toggle('translate-x-full');
+        if (!hasWelcomed && !chatWindow.classList.contains('hidden')) {
+            setTimeout(() => {
+                const welcomeMessage = document.createElement('div');
+                welcomeMessage.className = 'chatbot-message bot mb-2 p-2 sm:p-3 rounded-lg text-white text-sm sm:text-base';
+                welcomeMessage.textContent = 'Bem-vindo(a)! Estou aqui para ajudar com suas dúvidas. Como posso começar?';
+                messages.appendChild(welcomeMessage);
+                messages.scrollTop = messages.scrollHeight;
+                sessionStorage.setItem('chatbotWelcomed', 'true');
+                hasWelcomed = true;
+            }, 1000);
+        }
+    });
+
+    closeBtn.addEventListener('click', () => {
+        chatWindow.classList.add('hidden');
+        chatWindow.classList.add('translate-x-full');
+    });
+
+    // Form submission with typing indicator
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         if (!input.value.trim()) return;
+
+        // Add user message
         const userMessage = document.createElement('div');
         userMessage.className = 'chatbot-message user mb-2 p-2 sm:p-3 rounded-lg text-white text-sm sm:text-base';
         userMessage.textContent = input.value;
         messages.appendChild(userMessage);
 
+        // Add typing indicator
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'chatbot-typing mb-2';
+        typingIndicator.textContent = 'Digitando...';
+        messages.appendChild(typingIndicator);
+        messages.scrollTop = messages.scrollHeight;
+
+        // Mock bot response
         setTimeout(() => {
+            messages.removeChild(typingIndicator);
             const botMessage = document.createElement('div');
             botMessage.className = 'chatbot-message bot mb-2 p-2 sm:p-3 rounded-lg text-white text-sm sm:text-base';
             botMessage.textContent = 'Entendido! Como posso ajudar mais?';
             messages.appendChild(botMessage);
             messages.scrollTop = messages.scrollHeight;
-        }, 500);
+        }, 1500);
 
         input.value = '';
         messages.scrollTop = messages.scrollHeight;
     });
 
+    // File upload handling
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -154,19 +187,28 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         messages.appendChild(fileMessage);
 
+        // Add typing indicator
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'chatbot-typing mb-2';
+        typingIndicator.textContent = 'Digitando...';
+        messages.appendChild(typingIndicator);
+        messages.scrollTop = messages.scrollHeight;
+
+        // Mock bot response
         setTimeout(() => {
+            messages.removeChild(typingIndicator);
             const botMessage = document.createElement('div');
             botMessage.className = 'chatbot-message bot mb-2 p-2 sm:p-3 rounded-lg text-white text-sm sm:text-base';
             botMessage.textContent = `Recebi o arquivo ${file.name}. Como posso ajudá-lo com isso?`;
             messages.appendChild(botMessage);
             messages.scrollTop = messages.scrollHeight;
-        }, 500);
+        }, 1500);
 
         fileInput.value = '';
         messages.scrollTop = messages.scrollHeight;
     });
 
-    // Efeito ripple
+    // Button ripple effect
     document.querySelectorAll('button').forEach((el) => {
         el.addEventListener('click', (e) => {
             const ripple = document.createElement('span');

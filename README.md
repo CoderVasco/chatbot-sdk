@@ -9,6 +9,9 @@ Este SDK injeta um chatbot completo, bonito e responsivo com **uma única linha 
 1. **Adicione o container e o script na sua página HTML**:
 
 ```html
+<!-- Script do Tailwindcss -->
+<script src="https://cdn.tailwindcss.com"></script>
+
 <!-- Container do Chatbot -->
 <div id="chatbot-container"></div>
 
@@ -42,22 +45,24 @@ chatbot-sdk/
 └── README.md            # Este arquivo
 
 
-
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chatbot SDK Teste</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatBot SDK Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>Exemplo de Integração com o Chatbot</h1>
-
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+    <h1>Exemplo de Integração com o Chatbot</h1>
+  <!-- Container do Chatbot -->
   <div id="chatbot-container"></div>
 
-  <script src="src/chatbot.js"></script>
+  <!-- SDK: Chatbot -->
+  <script src="./src/chatbot.js"></script>
 </body>
 </html>
+
 
 
 🛠️ Personalização

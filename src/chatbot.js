@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Chatbot SDK carregado');
     const container = document.getElementById('chatbot-container');
     if (!container) {
         console.error('Chatbot container not found. Please add <div id="chatbot-container"></div> to your HTML.');
@@ -106,17 +107,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileError = document.getElementById('file-error');
 
     // Check if critical elements exist
-    if (!form || !input || !messages) {
-        console.error('One or more critical elements (form, input, messages) not found.');
+    if (!toggleBtn || !chatWindow || !form || !input || !messages) {
+        console.error('One or more critical elements (toggleBtn, chatWindow, form, input, messages) not found.');
         return;
     }
 
     // Welcome message logic
-    let hasWelcomed = sessionStorage.getItem('chatbotWelcomed');
+    const hasWelcomed = sessionStorage.getItem('chatbotWelcomed') === 'true';
+    console.log('hasWelcomed inicial:', hasWelcomed);
     toggleBtn.addEventListener('click', () => {
+        console.log('Botão toggle clicado');
         chatWindow.classList.toggle('hidden');
         chatWindow.classList.toggle('translate-x-full');
-        if (!hasWelcomed && !chatWindow.classList.contains('hidden')) {
+        const isChatOpen = !chatWindow.classList.contains('hidden');
+        console.log('Chat aberto:', isChatOpen, 'hasWelcomed:', hasWelcomed);
+        if (!hasWelcomed && isChatOpen) {
+            console.log('Exibindo mensagem de boas-vindas');
             setTimeout(() => {
                 const welcomeMessage = document.createElement('div');
                 welcomeMessage.className = 'chatbot-message bot mb-2 p-2 sm:p-3 rounded-lg text-white text-sm sm:text-base';
@@ -124,18 +130,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 messages.appendChild(welcomeMessage);
                 messages.scrollTop = messages.scrollHeight;
                 sessionStorage.setItem('chatbotWelcomed', 'true');
-                hasWelcomed = true;
+                // Atualize a variável local
+                window.chatbotHasWelcomed = true;
+                console.log('Mensagem de boas-vindas exibida');
             }, 1000);
         }
     });
 
     closeBtn.addEventListener('click', () => {
+        console.log('Botão fechar clicado');
         chatWindow.classList.add('hidden');
         chatWindow.classList.add('translate-x-full');
     });
 
     // Form submission with typing indicator
     form.addEventListener('submit', (e) => {
+        console.log('Formulário submetido');
         e.preventDefault();
         if (!input.value.trim()) return;
 
@@ -165,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // File upload handling
     fileInput.addEventListener('change', (e) => {
+        console.log('Arquivo selecionado');
         const file = e.target.files[0];
         if (!file) return;
         const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg'];

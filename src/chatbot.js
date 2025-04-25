@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
-    // Initialize elements
+    // Initialize elements after HTML injection
     const toggleBtn = document.getElementById('chatbot-toggle');
     const closeBtn = document.getElementById('chatbot-close');
     const chatWindow = document.getElementById('chatbot-window');
@@ -104,6 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('chatbot-file');
     const messages = document.getElementById('chatbot-messages');
     const fileError = document.getElementById('file-error');
+
+    // Check if critical elements exist
+    if (!form || !input || !messages) {
+        console.error('One or more critical elements (form, input, messages) not found.');
+        return;
+    }
 
     // Welcome message logic
     let hasWelcomed = sessionStorage.getItem('chatbotWelcomed');
@@ -133,20 +139,17 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         if (!input.value.trim()) return;
 
-        // Add user message
         const userMessage = document.createElement('div');
         userMessage.className = 'chatbot-message user mb-2 p-2 sm:p-3 rounded-lg text-white text-sm sm:text-base';
         userMessage.textContent = input.value;
         messages.appendChild(userMessage);
 
-        // Add typing indicator
         const typingIndicator = document.createElement('div');
         typingIndicator.className = 'chatbot-typing mb-2';
         typingIndicator.textContent = 'Digitando...';
         messages.appendChild(typingIndicator);
         messages.scrollTop = messages.scrollHeight;
 
-        // Mock bot response
         setTimeout(() => {
             messages.removeChild(typingIndicator);
             const botMessage = document.createElement('div');
@@ -187,14 +190,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         messages.appendChild(fileMessage);
 
-        // Add typing indicator
         const typingIndicator = document.createElement('div');
         typingIndicator.className = 'chatbot-typing mb-2';
         typingIndicator.textContent = 'Digitando...';
         messages.appendChild(typingIndicator);
         messages.scrollTop = messages.scrollHeight;
 
-        // Mock bot response
         setTimeout(() => {
             messages.removeChild(typingIndicator);
             const botMessage = document.createElement('div');
